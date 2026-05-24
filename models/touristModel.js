@@ -34,7 +34,7 @@ const createTourist = (FName, LName, Email, Password) => {
       if (err) {
         reject(err);
       } else {
-        resolve(result[0]);
+        resolve(result);
       }
     });
   });
