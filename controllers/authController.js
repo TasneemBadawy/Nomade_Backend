@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { findTouristByEmail, createTourist } from "../models/touristModel.js";
 import { findGuideByEmail, createGuide } from "../models/guideModel.js";
-
+import {generateToken} from '../utils/generateToken.js';
 /******************************Tourist*******************************************/
 /***************************Register Tourist**********************************/
 
@@ -56,7 +56,15 @@ const logInTourist = async (req, res) => {
     //Compare the two passwords
     const passwordCheck = await bcrypt.compare(password, existedUser.Password);
     if (passwordCheck) {
-      res.status(200).send("logged in successfully");
+
+        // if password is correct then generate a token for him
+        const token = generateToken(Email);
+
+     return res.status(200).json({
+        message : "logged in successfully",
+        token,
+        user: existedUser
+     });
     } else {
       console.log("The user doesn't exist");
       return res.status(400).json({
@@ -125,7 +133,16 @@ const logInGuide = async (req, res) => {
     //Compare the two passwords
     const passwordCheck = await bcrypt.compare(password, existedGuide.Password);
     if (passwordCheck) {
-      res.status(200).send("logged in successfully");
+        
+          // if password is correct then generate a token for him
+        const token = generateToken(Email);
+        
+      return res.status(200).json({
+        message : "logged in successfully",
+        token,
+        user: existedGuide
+      });
+
     } else {
       console.log("The TourGuide doesn't exist");
       return res.status(400).json({
