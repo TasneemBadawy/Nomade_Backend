@@ -41,6 +41,7 @@ export const getAllTours = () => {
 
     db.query(sql, (err, result) => {
       if (err) return reject(err);
+      if (result.length == 0) resolve("There does not exist any tours now");
       resolve(result);
     });
   });
@@ -55,7 +56,7 @@ export const getSingleTour = (Tour_ID) => {
       WHERE Tour_ID = ?`;
     db.query(sql, [Tour_ID], (err, result) => {
       if (err) return reject("Tour doesn't exist", err);
-      if (result.length == 0) resolve("Tour doesn't exist");
+      if (result.length == 0) resolve("This tour does not exist");
       resolve(result[0]);
     });
   });
