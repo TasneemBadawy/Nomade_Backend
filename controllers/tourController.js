@@ -49,10 +49,10 @@ export const getTours = async (req, res) => {
 
 // Get single tour
 export const getOneTour = async (req, res) => {
-  const { id } = req.params;
+  const { Tour_ID } = req.params;
 
   try {
-    const tour = await getSingleTour(id);
+    const tour = await getSingleTour(Tour_ID);
     res.status(200).json(tour);
   } catch (err) {
     res.status(500).json({
