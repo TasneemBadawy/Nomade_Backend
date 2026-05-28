@@ -1,32 +1,28 @@
-import {
-  createTour,
-  getAllTours,
-  getSingleTour,
-} from "../models/tourModel.js";
+import { createTour, getAllTours, getSingleTour } from "../models/tourModel.js";
 
 // Add Tour
 export const addTour = async (req, res) => {
   const {
     Tour_name,
     Price_per_person,
-    Description,
-    Days,
-    Nights,
     Country,
     City,
     Street,
+    tour_Description,
+    Days,
+    Nights,
   } = req.body;
 
   try {
     await createTour(
       Tour_name,
       Price_per_person,
-      Description,
-      Days,
-      Nights,
       Country,
       City,
-      Street
+      Street,
+      tour_Description,
+      Days,
+      Nights,
     );
 
     res.status(201).json({
