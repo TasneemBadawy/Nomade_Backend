@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
 import { findTouristByEmail, createTourist } from "../models/touristModel.js";
 import { findGuideByEmail, createGuide } from "../models/guideModel.js";
-import {generateToken} from '../utils/generateToken.js';
+import { generateToken } from "../utils/generateToken.js";
 /******************************Tourist*******************************************/
 /***************************Register Tourist**********************************/
 
-const registerTourist = async (req, res) => {
+export const registerTourist = async (req, res) => {
   const { FName, LName, Email, password } = req.body;
 
   // first find if exist in the database
@@ -38,7 +38,7 @@ const registerTourist = async (req, res) => {
 };
 /**************************Login Tourist**********************************/
 
-const logInTourist = async (req, res) => {
+export const logInTourist = async (req, res) => {
   const { Email, password } = req.body;
 
   // see if it exists
@@ -56,15 +56,14 @@ const logInTourist = async (req, res) => {
     //Compare the two passwords
     const passwordCheck = await bcrypt.compare(password, existedUser.Password);
     if (passwordCheck) {
+      // if password is correct then generate a token for him
+      const token = generateToken(Email);
 
-        // if password is correct then generate a token for him
-        const token = generateToken(Email);
-
-     return res.status(200).json({
-        message : "logged in successfully",
+      return res.status(200).json({
+        message: "logged in successfully",
         token,
-        user: existedUser
-     });
+        user: existedUser,
+      });
     } else {
       console.log("The user doesn't exist");
       return res.status(400).json({
@@ -82,7 +81,7 @@ const logInTourist = async (req, res) => {
 /******************************Guide**************************/
 /***************************Register Guide**********************************/
 
-const registerGuide = async (req, res) => {
+export const registerGuide = async (req, res) => {
   const { FName, LName, Email, password } = req.body;
 
   // first find if exist in the database
@@ -115,7 +114,7 @@ const registerGuide = async (req, res) => {
 };
 /***************************Login Guide**********************************/
 
-const logInGuide = async (req, res) => {
+export const logInGuide = async (req, res) => {
   const { Email, password } = req.body;
 
   // see if it exists
@@ -133,16 +132,14 @@ const logInGuide = async (req, res) => {
     //Compare the two passwords
     const passwordCheck = await bcrypt.compare(password, existedGuide.Password);
     if (passwordCheck) {
-        
-          // if password is correct then generate a token for him
-        const token = generateToken(Email);
-        
-      return res.status(200).json({
-        message : "logged in successfully",
-        token,
-        user: existedGuide
-      });
+      // if password is correct then generate a token for him
+      const token = generateToken(Email);
 
+      return res.status(200).json({
+        message: "logged in successfully",
+        token,
+        user: existedGuide,
+      });
     } else {
       console.log("The TourGuide doesn't exist");
       return res.status(400).json({
