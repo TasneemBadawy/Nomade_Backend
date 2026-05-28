@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.post("/add-tour", addTour);
 router.get("/Tours", getTours);
-router.get("/Tours/:id", getOneTour);
+router.get("/Tours/:Tour_ID", getOneTour);
 
 export default router;
