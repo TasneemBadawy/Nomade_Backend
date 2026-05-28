@@ -8,7 +8,7 @@ import {
 const router = express.Router();
 
 router.post("/add-tour", addTour);
-router.get("/tours", getTours);
-router.get("/tours/:id", getOneTour);
+router.get("/Tours", getTours);
+router.get("/Tours/:id", getOneTour);
 
 export default router;
