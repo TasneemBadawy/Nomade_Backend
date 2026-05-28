@@ -12,11 +12,7 @@ export const createTour = (
   Nights,
 ) => {
   return new Promise((resolve, reject) => {
-    const sql = `
-      INSERT INTO Tours
-      (Tour_name, Price_per_person,Country , City, Street, tour_Description,Days,Nights)
-      VALUES (?, ?, ?, ?, ?, ?, ?,?)
-    `;
+    const sql = `INSERT INTO Tours(Tour_name, Price_per_person,Country , City, Street, tour_Description,Days,Nights)VALUES (?, ?, ?, ?, ?, ?, ?,?)`;
 
     db.query(
       sql,
@@ -51,15 +47,15 @@ export const getAllTours = () => {
 };
 
 // Get single tour
-export const getSingleTour = (id) => {
+export const getSingleTour = (Tour_ID) => {
   return new Promise((resolve, reject) => {
     const sql = `
       SELECT *
       FROM Tours
-      WHERE id = ?`;
-
-    db.query(sql, [id], (err, result) => {
-      if (err) return reject(err);
+      WHERE Tour_ID = ?`;
+    db.query(sql, [Tour_ID], (err, result) => {
+      if (err) return reject("Tour doesn't exist", err);
+      if (result.length == 0) resolve("Tour doesn't exist");
       resolve(result[0]);
     });
   });
