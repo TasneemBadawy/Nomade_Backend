@@ -2,7 +2,7 @@ import db from "../config/database.js";
 
 // find by email function
 
-const findTouristByEmail = (Email) => {
+export const findTouristByEmail = (Email) => {
   return new Promise((resolve, reject) => {
     // the query that will search
     const sql = `SELECT * FROM User
@@ -20,7 +20,7 @@ const findTouristByEmail = (Email) => {
 
 // create a user
 
-const createTourist = (FName, LName, Email, Password) => {
+export const createTourist = (FName, LName, Email, Password) => {
   return new Promise((resolve, reject) => {
     // the query we will need
 
@@ -34,7 +34,7 @@ const createTourist = (FName, LName, Email, Password) => {
       if (err) {
         reject(err);
       } else {
-        resolve(result);
+        resolve(result[0]);
       }
     });
   });
