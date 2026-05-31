@@ -56,8 +56,20 @@ export const getSingleTour = (Tour_ID) => {
       WHERE Tour_ID = ?`;
     db.query(sql, [Tour_ID], (err, result) => {
       if (err) return reject("Tour doesn't exist", err);
-      if (result.length == 0) resolve("This tour does not exist");
+      if (result.length == 0) resolve("Tour not found");
       resolve(result[0]);
+    });
+  });
+};
+
+// Delete tour
+export const deleteTourById = (Tour_ID) => {
+  return new Promise((resolve, reject) => {
+    const sql = `DELETE FROM Tours WHERE Tour_ID = ?`;
+
+    db.query(sql, [Tour_ID], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
     });
   });
 };
