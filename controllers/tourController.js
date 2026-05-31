@@ -1,4 +1,9 @@
-import { createTour, getAllTours, getSingleTour } from "../models/tourModel.js";
+import {
+  createTour,
+  getAllTours,
+  getSingleTour,
+  deleteTourById,
+} from "../models/tourModel.js";
 
 // Add Tour
 export const addTour = async (req, res) => {
@@ -54,6 +59,30 @@ export const getOneTour = async (req, res) => {
   try {
     const tour = await getSingleTour(Tour_ID);
     res.status(200).json(tour);
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+};
+
+// Delete Tour
+export const deleteTour = async (req, res) => {
+  const { Tour_ID } = req.params;
+
+  try {
+    const result = await deleteTourById(Tour_ID);
+
+    // check if tour  exist or not
+    if (result.affectedRows == 0) {
+      return res.status(404).json({
+        message: "Tour not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Tour deleted successfully",
+    });
   } catch (err) {
     res.status(500).json({
       error: err.message,
