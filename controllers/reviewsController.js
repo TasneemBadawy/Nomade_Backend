@@ -39,10 +39,10 @@ export const getReviewsWithUserId = async(req,res)=>{
   const{id} = req.params;
 
   try{
-     const review = await getReviewsByUserId(userId);
+     const review = await getReviewsByUserId(id);
 
      res.status(200).json(review);
-
+   console.log(review);
   }catch(err){
 
     res.status(500).json({
@@ -88,12 +88,12 @@ export const RemoveReview = async(req , res)=>{
 
           // check ownership
 
-          if(review[0].User_ID !== req.user.id){
+          /*if(review[0].User_ID !== req.id){
 
                return res.status(403).json({
                 message: "You are not allowed to delete this review"
                 });
-          }
+          }*/
 
           // Delete
 

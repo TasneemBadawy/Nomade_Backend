@@ -2,7 +2,7 @@ import db from "../config/database.js";
 import mysql from "mysql2";
 
 export const createReview = (User_ID, Place, Title, Rate, username, Content)=>{
-       
+   
     return new Promise ((resolve , reject) =>{
          
         const sql = `

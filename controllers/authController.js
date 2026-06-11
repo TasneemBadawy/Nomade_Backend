@@ -6,7 +6,7 @@ import { generateToken } from "../utils/generateToken.js";
 /***************************Register Tourist**********************************/
 
 export const registerTourist = async (req, res) => {
-  const { FName, LName, Email, password } = req.body;
+  const { FName, LName, Email, Password } = req.body;
 
   // first find if exist in the database
   const existedUser = await findTouristByEmail(Email);
@@ -19,9 +19,10 @@ export const registerTourist = async (req, res) => {
         message: "Invalid Email or Password",
       });
     }
-
+       console.log(Password);
     // hash password
-    const hashPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(Password, salt);
 
     // create user
     await createTourist(FName, LName, Email, hashPassword);
@@ -39,7 +40,7 @@ export const registerTourist = async (req, res) => {
 /**************************Login Tourist**********************************/
 
 export const logInTourist = async (req, res) => {
-  const { Email, password } = req.body;
+  const { Email, Password } = req.body;
 
   // see if it exists
 
@@ -54,10 +55,11 @@ export const logInTourist = async (req, res) => {
     }
 
     //Compare the two passwords
-    const passwordCheck = await bcrypt.compare(password, existedUser.Password);
+    const passwordCheck = await bcrypt.compare(Password, existedUser.Password);
     if (passwordCheck) {
       // if password is correct then generate a token for him
-      const token = generateToken(Email);
+      const token = generateToken( existedUser.Email,
+                                    existedUser.Role);
 
       return res.status(200).json({
         message: "logged in successfully",
@@ -115,7 +117,7 @@ export const registerGuide = async (req, res) => {
 /***************************Login Guide**********************************/
 
 export const logInGuide = async (req, res) => {
-  const { Email, password } = req.body;
+  const { Email, password , Role} = req.body;
 
   // see if it exists
 
@@ -133,7 +135,7 @@ export const logInGuide = async (req, res) => {
     const passwordCheck = await bcrypt.compare(password, existedGuide.Password);
     if (passwordCheck) {
       // if password is correct then generate a token for him
-      const token = generateToken(Email);
+      const token = generateToken(existedGuide.Email , "Guide");
 
       return res.status(200).json({
         message: "logged in successfully",
