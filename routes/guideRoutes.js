@@ -1,10 +1,22 @@
 import express from "express";
-import { registerGuide , logInGuide } from "../controllers/authController";
+import {
+  registerGuide,
+  loginGuide,
+  getGuides,
+  getGuide,
+  updateGuide,
+} from "../controllers/guideController.js";
+import logInAuthMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// Register a new Guide
-router.post("/guide/register", registerGuide);
-router.post("/guide/login", logInGuide);
+// Public routes
+router.post("/guides/register", registerGuide);
+router.post("/guides/login", loginGuide);
+router.get("/guides", getGuides);
+router.get("/guides/:id", getGuide);
+
+// Protected routes (require authentication)
+router.put("/guides/:id", logInAuthMiddleware, updateGuide);
 
 export default router;
