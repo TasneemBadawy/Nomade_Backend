@@ -1,7 +1,5 @@
 import express from "express";
 import {
-  registerGuide,
-  loginGuide,
   getGuides,
   getGuide,
   updateGuide,
@@ -11,8 +9,6 @@ import logInAuthMiddleware from "../middlewares/authMiddleware.js";
 const router = express.Router();
 
 // Public routes
-router.post("/guides/register", registerGuide);
-router.post("/guides/login", loginGuide);
 router.get("/guides", getGuides);
 router.get("/guides/:id", getGuide);
 
