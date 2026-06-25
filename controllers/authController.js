@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { findTouristByEmail, createTourist } from "../models/touristModel.js";
 import { findGuideByEmail, createGuide } from "../models/guideModel.js";
 import { generateToken } from "../utils/generateToken.js";
+
 /******************************Tourist*******************************************/
 /***************************Register Tourist**********************************/
 
@@ -19,10 +20,9 @@ export const registerTourist = async (req, res) => {
         message: "Invalid Email or Password",
       });
     }
-       console.log(Password);
+
     // hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(Password, salt);
+    const hashPassword = await bcrypt.hash(Password, 10);
 
     // create user
     await createTourist(FName, LName, Email, hashPassword);
@@ -58,9 +58,8 @@ export const logInTourist = async (req, res) => {
     const passwordCheck = await bcrypt.compare(Password, existedUser.Password);
     if (passwordCheck) {
       // if password is correct then generate a token for him
-      const token = generateToken( existedUser.Email,
-                                    existedUser.Role);
-
+      const token = generateToken(Email);
+      delete existedUser.Password;
       return res.status(200).json({
         message: "logged in successfully",
         token,
@@ -83,75 +82,149 @@ export const logInTourist = async (req, res) => {
 /******************************Guide**************************/
 /***************************Register Guide**********************************/
 
-export const registerGuide = async (req, res) => {
-  const { FName, LName, Email, password } = req.body;
+// Validation helpers
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
 
-  // first find if exist in the database
-  const existedGuide = await findGuideByEmail(Email);
+const validatePassword = (password) => {
+  return password && password.length >= 6;
+};
+
+const validateSocialMediaUrl = (url) => {
+  if (!url || url === "") return true;
+  const urlRegex =
+    /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?$/;
+  return urlRegex.test(url);
+};
+
+// Register a new guide
+export const registerGuide = async (req, res) => {
+  const {
+    FName,
+    LName,
+    Email,
+    Password,
+    Country,
+    About,
+    FaceBook,
+    Linkedin,
+    Instagram,
+    phoneNumbers = [],
+    specializations = [],
+    certificates = [],
+    languages = [],
+  } = req.body;
+
+  // Validation
+  const errors = [];
+
+  if (!FName || FName.trim() === "") errors.push("First name is required");
+  if (!LName || LName.trim() === "") errors.push("Last name is required");
+  if (!Email || !validateEmail(Email)) errors.push("Valid email is required");
+  if (!Password || !validatePassword(Password))
+    errors.push("Password must be at least 6 characters");
+  if (Country && Country.length > 50) errors.push("Country name too long");
+  if (About && About.length > 65535) errors.push("About section too long");
+  if (FaceBook && !validateSocialMediaUrl(FaceBook))
+    errors.push("Invalid Facebook URL");
+  if (Linkedin && !validateSocialMediaUrl(Linkedin))
+    errors.push("Invalid LinkedIn URL");
+  if (Instagram && !validateSocialMediaUrl(Instagram))
+    errors.push("Invalid Instagram URL");
+
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
+  }
 
   try {
-    // if exists
-    if (existedGuide) {
-      console.log("The TourGuide already existed");
-      return res.status(400).json({
-        message: "Invalid Email or Password",
+    // Check if guide already exists
+    const existingGuide = await findGuideByEmail(Email);
+    if (existingGuide) {
+      return res.status(409).json({
+        error: "A guide with this email already exists",
       });
     }
 
-    // hash password
-    const hashPassword = await bcrypt.hash(password, 10);
+    // Hash password
+    const hashedPassword = await bcrypt.hash(Password, 10);
 
-    // create user
-    await createGuide(FName, LName, Email, hashPassword);
+    // Create guide with all related data
+    await createGuide(
+      FName,
+      LName,
+      Email,
+      hashedPassword,
+      Country || null,
+      About || null,
+      FaceBook || null,
+      Linkedin || null,
+      Instagram || null,
+      phoneNumbers,
+      specializations,
+      certificates,
+      languages,
+    );
 
     res.status(201).json({
-      message: "Registered Successfully",
+      message: "Guide registered successfully",
     });
   } catch (err) {
-    console.log(err);
+    console.error("Guide registration error:", err);
     res.status(500).json({
-      error: err.message,
+      error: "Failed to register guide",
+      message: err.message,
     });
   }
 };
+
 /***************************Login Guide**********************************/
+export const loginGuide = async (req, res) => {
+  const { Email, Password } = req.body;
 
-export const logInGuide = async (req, res) => {
-  const { Email, password , Role} = req.body;
+  if (!Email || !validateEmail(Email)) {
+    return res.status(400).json({
+      error: "Valid email is required",
+    });
+  }
 
-  // see if it exists
+  if (!Password) {
+    return res.status(400).json({
+      error: "Password is required",
+    });
+  }
 
   try {
-    const existedGuide = await findGuideByEmail(Email);
+    const guide = await findGuideByEmail(Email);
 
-    if (!existedGuide) {
-      console.log("The TourGuide doesn't exist");
-      return res.status(400).json({
-        message: "Invalid Email or Password",
+    if (!guide) {
+      return res.status(401).json({
+        error: "Invalid email or password",
       });
     }
 
-    //Compare the two passwords
-    const passwordCheck = await bcrypt.compare(password, existedGuide.Password);
-    if (passwordCheck) {
-      // if password is correct then generate a token for him
-      const token = generateToken(existedGuide.Email , "Guide");
+    const isPasswordValid = await bcrypt.compare(Password, guide.Password);
 
-      return res.status(200).json({
-        message: "logged in successfully",
-        token,
-        user: existedGuide,
-      });
-    } else {
-      console.log("The TourGuide doesn't exist");
-      return res.status(400).json({
-        message: "Invalid Email or Password",
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        error: "Invalid email or password",
       });
     }
+
+    const token = generateToken(Email);
+    delete guide.Password;
+
+    res.status(200).json({
+      message: "Logged in successfully",
+      token,
+      guide,
+    });
   } catch (err) {
-    console.log(err);
+    console.error("Guide login error:", err);
     res.status(500).json({
-      error: err.message,
+      error: "Failed to login",
+      message: err.message,
     });
   }
 };
