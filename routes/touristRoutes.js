@@ -7,6 +7,7 @@ const router = express.Router();
 // Register a new Tourist
 
 router.post("/tourist/register", registerTourist);
+
 router.post("/tourist/login", logInTourist);
 
 export default router;

@@ -13,7 +13,7 @@ export const addTour = async (req, res) => {
     Country,
     City,
     Street,
-    tour_Description,
+    Description,
     Days,
     Nights,
   } = req.body;
@@ -25,7 +25,7 @@ export const addTour = async (req, res) => {
       Country,
       City,
       Street,
-      tour_Description,
+      Description,
       Days,
       Nights,
     );

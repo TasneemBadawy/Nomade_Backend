@@ -7,12 +7,12 @@ export const createTour = (
   Country,
   City,
   Street,
-  tour_Description,
+ Description,
   Days,
   Nights,
 ) => {
   return new Promise((resolve, reject) => {
-    const sql = `INSERT INTO Tours(Tour_name, Price_per_person,Country , City, Street, tour_Description,Days,Nights)VALUES (?, ?, ?, ?, ?, ?, ?,?)`;
+    const sql = `INSERT INTO Tours(Tour_name, Price_per_person,Country , City, Street, Description,Days,Nights)VALUES (?, ?, ?, ?, ?, ?, ?,?)`;
 
     db.query(
       sql,
@@ -22,7 +22,7 @@ export const createTour = (
         Country,
         City,
         Street,
-        tour_Description,
+        Description,
         Days,
         Nights,
       ],

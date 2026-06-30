@@ -6,10 +6,22 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import activityRoutes from "./routes/activityRoutes.js";
 import guideRoutes from "./routes/guideRoutes.js";
+//import { version } from "react";
 config();
 
+import swaggerDocs from "./swagger/swaggerDocs.js";
+
+
 const app = express();
+
+swaggerDocs(app);
 app.use(express.json());
+
+/*const options = {
+  definition:
+const swaggerSpec = swaggerJsdoc(options);*/
+
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api", tourRoutes);
