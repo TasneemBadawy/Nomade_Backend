@@ -370,3 +370,125 @@ export const updateGuideLanguages = (guideId, languages) => {
     });
   });
 };
+
+// Delete Guide by ID
+export const deleteGuideById = (guideId) => {
+  return new Promise((resolve, reject) => {
+    const sql = `DELETE FROM Tourguide WHERE Guide_ID = ?`;
+
+    db.query(sql, [guideId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+// Search Guides by Country and Specialization
+export const searchAndFilterGuides = (Country, specialization) => {
+  return new Promise((resolve, reject) => {
+    let sql = `
+      SELECT DISTINCT g.Guide_ID 
+      FROM Tourguide g
+      LEFT JOIN Guide_Specializations s ON g.Guide_ID = s.G_ID
+      WHERE 1=1
+    `;
+    const params = [];
+
+    if (Country && Country.trim() !== "") {
+      sql += ` AND g.Country LIKE ?`;
+      params.push(`%${Country}%`);
+    }
+
+    if (specialization && specialization.trim() !== "") {
+      sql += ` AND s.Specialization LIKE ?`;
+      params.push(`%${specialization}%`);
+    }
+
+    db.query(sql, params, async (err, rows) => {
+      if (err) return reject(err);
+
+      if (rows.length === 0) {
+        return resolve([]);
+      }
+
+      try {
+        const fullGuidesResults = [];
+
+        for (const row of rows) {
+          const guideId = row.Guide_ID;
+
+          const guideInfo = await new Promise((resGuide, rejGuide) => {
+            db.query(
+              "SELECT * FROM Tourguide WHERE Guide_ID = ?",
+              [guideId],
+              (err, res) => {
+                if (err) rejGuide(err);
+                else resGuide(res[0]);
+              },
+            );
+          });
+
+          const phoneNumbers = await new Promise((resPhone, rejPhone) => {
+            db.query(
+              "SELECT Phone_Number FROM Guide_PhoneNumbers WHERE G_ID = ?",
+              [guideId],
+              (err, res) => {
+                if (err) rejPhone(err);
+                else resPhone(res.map((p) => p.Phone_Number));
+              },
+            );
+          });
+
+          const specializations = await new Promise((resSpec, rejSpec) => {
+            db.query(
+              "SELECT Specialization FROM Guide_Specializations WHERE G_ID = ?",
+              [guideId],
+              (err, res) => {
+                if (err) rejSpec(err);
+                else resSpec(res.map((s) => s.Specialization));
+              },
+            );
+          });
+
+          const certificates = await new Promise((resCert, rejCert) => {
+            db.query(
+              "SELECT Certificate FROM Guide_Certificates WHERE G_ID = ?",
+              [guideId],
+              (err, res) => {
+                if (err) rejCert(err);
+                else resCert(res.map((c) => c.Certificate));
+              },
+            );
+          });
+
+          const languages = await new Promise((resLang, rejLang) => {
+            db.query(
+              "SELECT Language FROM Guide_Languages WHERE G_ID = ?",
+              [guideId],
+              (err, res) => {
+                if (err) rejLang(err);
+                else resLang(res.map((l) => l.Language));
+              },
+            );
+          });
+
+          const completeGuide = {
+            ...guideInfo,
+            phoneNumbers,
+            specializations,
+            certificates,
+            languages,
+          };
+
+          delete completeGuide.Password;
+
+          fullGuidesResults.push(completeGuide);
+        }
+
+        resolve(fullGuidesResults);
+      } catch (innerErr) {
+        reject(innerErr);
+      }
+    });
+  });
+};
