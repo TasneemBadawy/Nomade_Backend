@@ -1,7 +1,5 @@
 import bcrypt from "bcrypt";
 import {
-  //findGuideByEmail,
-  // createGuide,
   getAllGuides,
   getGuideCompleteProfile,
   updateGuideProfile,
@@ -9,6 +7,8 @@ import {
   updateGuideSpecializations,
   updateGuideCertificates,
   updateGuideLanguages,
+  deleteGuideById,
+  searchAndFilterGuides,
 } from "../models/guideModel.js";
 import { generateToken } from "../utils/generateToken.js";
 
@@ -146,6 +146,43 @@ export const updateGuide = async (req, res) => {
     res.status(500).json({
       error: "Failed to update guide",
       message: err.message,
+    });
+  }
+};
+
+// Delete Guide
+export const deleteGuide = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await deleteGuideById(id);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        message: "Guide not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Guide deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+};
+
+// Search Guides
+export const searchGuides = async (req, res) => {
+  const { Country, specialization } = req.query;
+
+  try {
+    const guides = await searchAndFilterGuides(Country, specialization);
+    res.status(200).json(guides);
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
     });
   }
 };
