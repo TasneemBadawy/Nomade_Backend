@@ -4,6 +4,7 @@ import {
   getTours,
   getOneTour,
   deleteTour,
+  searchTours,
 } from "../controllers/tourController.js";
 import logInAuthMiddleware from "../middlewares/authMiddleware.js";
 import adminMiddleware from "../middlewares/adminMiddleware.js";
@@ -114,6 +115,7 @@ router.get("/Tours", getTours);
  *       500:
  *         description: Internal server error.
  */
+router.get("/tours/search", searchTours);
 
 router.get("/get_Tour/:Tour_ID", getOneTour);
 
