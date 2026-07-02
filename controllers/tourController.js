@@ -3,6 +3,7 @@ import {
   getAllTours,
   getSingleTour,
   deleteTourById,
+  searchAndFilterTours,
 } from "../models/tourModel.js";
 
 // Add Tour
@@ -13,7 +14,7 @@ export const addTour = async (req, res) => {
     Country,
     City,
     Street,
-    Description,
+    tour_Description,
     Days,
     Nights,
   } = req.body;
@@ -25,7 +26,7 @@ export const addTour = async (req, res) => {
       Country,
       City,
       Street,
-      Description,
+      tour_Description,
       Days,
       Nights,
     );
@@ -83,6 +84,20 @@ export const deleteTour = async (req, res) => {
     res.status(200).json({
       message: "Tour deleted successfully",
     });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+};
+
+// Search and Filter Tours
+export const searchTours = async (req, res) => {
+  const { Country, City, Price_per_person } = req.query;
+
+  try {
+    const tours = await searchAndFilterTours(Country, City, Price_per_person);
+    res.status(200).json(tours);
   } catch (err) {
     res.status(500).json({
       error: err.message,
