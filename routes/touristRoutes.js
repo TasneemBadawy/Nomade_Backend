@@ -1,13 +1,13 @@
 import express from "express";
-import { registerTourist , logInTourist } from "../controllers/authController";
+import {
+  getTouristProfile,
+  updateTouristProfile,
+} from "../controllers/touristController.js";
+import logInAuthMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-/******************************Tourist router******************************/
-// Register a new Tourist
-
-router.post("/tourist/register", registerTourist);
-
-router.post("/tourist/login", logInTourist);
+router.get("/get_profile/:id", logInAuthMiddleware, getTouristProfile);
+router.put("/update_profile/:id", logInAuthMiddleware, updateTouristProfile);
 
 export default router;
