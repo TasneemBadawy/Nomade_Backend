@@ -1,41 +1,42 @@
 import db from "../config/database.js";
-
-// find by email function
+import mysql from "mysql2";
 
 export const findTouristByEmail = (Email) => {
   return new Promise((resolve, reject) => {
-    // the query that will search
-    const sql = `SELECT * FROM User
-        WHERE Email = ? `;
-
+    const sql = `SELECT * FROM User WHERE Email = ?`;
     db.query(sql, [Email], (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result[0]);
-      }
+      if (err) reject(err);
+      else resolve(result[0]);
     });
   });
 };
 
-// create a user
-
 export const createTourist = (FName, LName, Email, Password) => {
   return new Promise((resolve, reject) => {
-    // the query we will need
-
-    const sql = `
-        INSERT INTO User
-        (FName, LName, Email, Password)
-        VALUES (?, ?, ?, ?)
-        `;
-
+    const sql = `INSERT INTO User (FName, LName, Email, Password) VALUES (?, ?, ?, ?)`;
     db.query(sql, [FName, LName, Email, Password], (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result[0]);
-      }
+      if (err) reject(err);
+      else resolve(result);
+    });
+  });
+};
+
+export const getTouristById = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT User_ID, FName, LName, Email FROM User WHERE User_ID = ?`;
+    db.query(sql, [id], (err, result) => {
+      if (err) reject(err);
+      else resolve(result[0]);
+    });
+  });
+};
+
+export const updateTouristProfileInDB = (id, FName, LName, Email) => {
+  return new Promise((resolve, reject) => {
+    const sql = `UPDATE User SET FName = ?, LName = ?, Email = ? WHERE User_ID = ?`;
+    db.query(sql, [FName, LName, Email, id], (err, result) => {
+      if (err) reject(err);
+      else resolve(result);
     });
   });
 };
